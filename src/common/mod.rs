@@ -5,17 +5,17 @@ use std::mem;
 #[cfg(target_os = "linux")]
 pub mod perf;
 
-mod bitmap;
 mod address_bitmap;
 mod address_map;
+mod bitmap;
 pub use self::address_bitmap::AddressBitmap;
 pub use self::address_map::AddressMap;
 
-pub const LOG_POINTER_SIZE : usize = 3;
-pub const POINTER_SIZE     : usize = 1 << LOG_POINTER_SIZE;
+pub const LOG_POINTER_SIZE: usize = 3;
+pub const POINTER_SIZE: usize = 1 << LOG_POINTER_SIZE;
 
 #[repr(C)]
-#[derive(Copy, Clone, Eq, Hash)]
+#[derive(Copy, Clone, Eq)]
 pub struct Address(usize);
 
 impl Address {
@@ -34,16 +34,19 @@ impl Address {
     }
     #[inline(always)]
     pub fn diff(&self, another: Address) -> usize {
-        debug_assert!(self.0 >= another.0, "for a.diff(b), a needs to be larger than b");
+        debug_assert!(
+            self.0 >= another.0,
+            "for a.diff(b), a needs to be larger than b"
+        );
         self.0 - another.0
     }
-    
+
     #[inline(always)]
-    pub unsafe fn load<T: Copy> (&self) -> T {
+    pub unsafe fn load<T: Copy>(&self) -> T {
         *(self.0 as *mut T)
     }
     #[inline(always)]
-    pub unsafe fn store<T> (&self, value: T) {
+    pub unsafe fn store<T>(&self, value: T) {
         *(self.0 as *mut T) = value;
     }
     #[inline(always)]
@@ -54,13 +57,13 @@ impl Address {
     pub fn align_up(&self, align: usize) -> Address {
         Address((self.0 + align - 1) & !(align - 1))
     }
-    
+
     pub fn is_aligned_to(&self, align: usize) -> bool {
         self.0 % align == 0
     }
-    
+
     pub fn memset(&self, char: u8, length: usize) {
-        let mut cur : *mut u8 = self.0 as *mut u8;
+        let mut cur: *mut u8 = self.0 as *mut u8;
         for _ in 0..length {
             unsafe {
                 *cur = char;
@@ -68,22 +71,22 @@ impl Address {
             }
         }
     }
-    
+
     #[inline(always)]
     pub unsafe fn to_object_reference(&self) -> ObjectReference {
         mem::transmute(self.0)
     }
     #[inline(always)]
-    pub fn from_ptr<T> (ptr: *const T) -> Address {
-        unsafe {mem::transmute(ptr)}
+    pub unsafe fn from_ptr<T>(ptr: *const T) -> Address {
+        unsafe { mem::transmute(ptr) }
     }
     #[inline(always)]
-    pub fn to_ptr<T> (&self) -> *const T {
-        unsafe {mem::transmute(self.0)}
+    pub fn to_ptr<T>(&self) -> *const T {
+        unsafe { mem::transmute(self.0) }
     }
     #[inline(always)]
-    pub fn to_ptr_mut<T> (&self) -> *mut T {
-        unsafe {mem::transmute(self.0)}
+    pub fn to_ptr_mut<T>(&self) -> *mut T {
+        unsafe { mem::transmute(self.0) }
     }
     #[inline(always)]
     pub fn as_usize(&self) -> usize {
@@ -98,7 +101,7 @@ impl Address {
 impl PartialOrd for Address {
     #[inline(always)]
     fn partial_cmp(&self, other: &Address) -> Option<cmp::Ordering> {
-        Some(self.0.cmp(& other.0))
+        Some(self.0.cmp(&other.0))
     }
 }
 
@@ -115,7 +118,7 @@ impl PartialEq for Address {
 
 impl fmt::UpperHex for Address {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:X}", self.0) 
+        write!(f, "{:X}", self.0)
     }
 }
 
@@ -131,13 +134,13 @@ impl fmt::Debug for Address {
     }
 }
 
-#[derive(Copy, Clone, Eq, Hash)]
-pub struct ObjectReference (usize);
+#[derive(Copy, Clone, Eq)]
+pub struct ObjectReference(usize);
 
 impl ObjectReference {
     #[inline(always)]
     pub fn to_address(&self) -> Address {
-        unsafe {mem::transmute(self.0)}
+        unsafe { mem::transmute(self.0) }
     }
     #[inline(always)]
     pub fn is_null(&self) -> bool {
@@ -151,7 +154,7 @@ impl ObjectReference {
 impl PartialOrd for ObjectReference {
     #[inline(always)]
     fn partial_cmp(&self, other: &ObjectReference) -> Option<cmp::Ordering> {
-        Some(self.0.cmp(& other.0))
+        Some(self.0.cmp(&other.0))
     }
 }
 
@@ -168,7 +171,7 @@ impl PartialEq for ObjectReference {
 
 impl fmt::UpperHex for ObjectReference {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:X}", self.0) 
+        write!(f, "{:X}", self.0)
     }
 }
 
@@ -198,13 +201,14 @@ pub fn lower_bits(value: u8, len: usize) -> u8 {
 mod tests {
     use super::*;
     extern crate libc;
-    
+
     #[test]
     pub fn test_u8_bits() {
-        let value : u8 = 0b1100_0011;
-        
+        let value: u8 = 0b1100_0011;
+
         assert_eq!(test_nth_bit(value, 6), true);
-        
+
         assert_eq!(lower_bits(value, 6), 0b00_0011);
     }
 }
+
