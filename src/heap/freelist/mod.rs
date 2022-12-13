@@ -145,15 +145,15 @@ use std::fmt;
 
 impl fmt::Display for FreeListSpace {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "FreeListSpace\n").unwrap();
-        write!(f, "{} used, {} total\n", self.used_bytes, self.size).unwrap();
-        write!(f, "nodes:\n").unwrap();
+        writeln!(f, "FreeListSpace").unwrap();
+        writeln!(f, "{} used, {} total", self.used_bytes, self.size).unwrap();
+        writeln!(f, "nodes:").unwrap();
 
         for node in self.current_nodes() {
-            write!(f, "  {}\n", node).unwrap();
+            writeln!(f, "  {}", node).unwrap();
         }
 
-        write!(f, "done\n")
+        writeln!(f, "done")
     }
 }
 

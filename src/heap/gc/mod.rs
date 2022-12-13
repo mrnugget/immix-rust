@@ -57,14 +57,14 @@ pub fn init(immix_space: Arc<ImmixSpace>, lo_space: Arc<RwLock<FreeListSpace>>) 
     gccontext.lo_space = Some(lo_space);
 }
 
-pub fn init_get_roots(get_roots: Box<Fn() -> Vec<ObjectReference> + Sync + Send>) {
+pub fn init_get_roots(get_roots: Box<dyn Fn() -> Vec<ObjectReference> + Sync + Send>) {
     *GET_ROOTS.write().unwrap() = get_roots;
 }
 
 pub fn trigger_gc() {
     trace!("Triggering GC...");
 
-    for mut m in MUTATORS.write().unwrap().iter_mut() {
+    for m in MUTATORS.write().unwrap().iter_mut() {
         if m.is_some() {
             m.as_mut().unwrap().set_take_yield(true);
         }
@@ -250,7 +250,7 @@ fn gc() {
     trace!("GC starts");
 
     // creates root deque
-    let mut roots: &mut Vec<ObjectReference> = &mut ROOTS.write().unwrap();
+    let roots: &mut Vec<ObjectReference> = &mut ROOTS.write().unwrap();
 
     // mark & trace
     {
@@ -260,7 +260,7 @@ fn gc() {
             gccontext.lo_space.as_ref().unwrap(),
         );
 
-        start_trace(&mut roots, immix_space.clone(), lo_space.clone());
+        start_trace(roots, immix_space.clone(), lo_space.clone());
     }
 
     trace!("trace done");
@@ -636,4 +636,3 @@ pub unsafe fn process_edge(
         local_queue.push(obj_addr);
     }
 }
-

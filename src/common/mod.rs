@@ -1,3 +1,5 @@
+#![allow(clippy::missing_safety_doc)]
+
 use std::cmp;
 use std::fmt;
 use std::mem;
@@ -81,12 +83,12 @@ impl Address {
         unsafe { mem::transmute(ptr) }
     }
     #[inline(always)]
-    pub fn to_ptr<T>(&self) -> *const T {
-        unsafe { mem::transmute(self.0) }
+    pub fn to_ptr<T>(self) -> *const T {
+        self.0 as *const T
     }
     #[inline(always)]
-    pub fn to_ptr_mut<T>(&self) -> *mut T {
-        unsafe { mem::transmute(self.0) }
+    pub fn to_ptr_mut<T>(&mut self) -> *mut T {
+        self.0 as *mut T
     }
     #[inline(always)]
     pub fn as_usize(&self) -> usize {
@@ -163,10 +165,6 @@ impl PartialEq for ObjectReference {
     fn eq(&self, other: &ObjectReference) -> bool {
         self.0 == other.0
     }
-    #[inline(always)]
-    fn ne(&self, other: &ObjectReference) -> bool {
-        self.0 != other.0
-    }
 }
 
 impl fmt::UpperHex for ObjectReference {
@@ -206,9 +204,8 @@ mod tests {
     pub fn test_u8_bits() {
         let value: u8 = 0b1100_0011;
 
-        assert_eq!(test_nth_bit(value, 6), true);
+        assert!(test_nth_bit(value, 6));
 
         assert_eq!(lower_bits(value, 6), 0b00_0011);
     }
 }
-
