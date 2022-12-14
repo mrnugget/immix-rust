@@ -75,7 +75,7 @@ impl Address {
     }
 
     #[inline(always)]
-    pub unsafe fn to_object_reference(&self) -> ObjectReference {
+    pub unsafe fn to_object_reference(self) -> ObjectReference {
         mem::transmute(self.0)
     }
     #[inline(always)]
@@ -112,10 +112,6 @@ impl PartialEq for Address {
     fn eq(&self, other: &Address) -> bool {
         self.0 == other.0
     }
-    #[inline(always)]
-    fn ne(&self, other: &Address) -> bool {
-        self.0 != other.0
-    }
 }
 
 impl fmt::UpperHex for Address {
@@ -141,7 +137,7 @@ pub struct ObjectReference(usize);
 
 impl ObjectReference {
     #[inline(always)]
-    pub fn to_address(&self) -> Address {
+    pub fn to_address(self) -> Address {
         unsafe { mem::transmute(self.0) }
     }
     #[inline(always)]

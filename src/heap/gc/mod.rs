@@ -27,8 +27,7 @@ use std::thread;
 use std::sync::atomic;
 
 lazy_static! {
-    static ref STW_COND: Arc<(Mutex<usize>, Condvar)> =
-        { Arc::new((Mutex::new(0), Condvar::new())) };
+    static ref STW_COND: Arc<(Mutex<usize>, Condvar)> = Arc::new((Mutex::new(0), Condvar::new()));
     static ref GET_ROOTS: RwLock<Box<Fn() -> Vec<ObjectReference> + Sync + Send>> =
         RwLock::new(Box::new(get_roots));
     static ref GC_CONTEXT: RwLock<GCContext> = RwLock::new(GCContext {
@@ -38,7 +37,7 @@ lazy_static! {
     static ref ROOTS: RwLock<Vec<ObjectReference>> = RwLock::new(vec![]);
 }
 
-static CONTROLLER: AtomicIsize = atomic::ATOMIC_ISIZE_INIT;
+static CONTROLLER: AtomicIsize = atomic::AtomicIsize::new(0);
 const NO_CONTROLLER: isize = -1;
 
 pub struct GCContext {

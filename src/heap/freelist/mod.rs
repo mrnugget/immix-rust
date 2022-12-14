@@ -21,7 +21,7 @@ impl FreeListSpace {
         FreeListSpace {
             current_nodes: LinkedList::new(),
             node_id: 0,
-            size: size,
+            size,
             used_bytes: 0,
         }
     }
@@ -42,7 +42,7 @@ impl FreeListSpace {
             self.current_nodes.push_front(Box::new(FreeListNode {
                 id: self.node_id,
                 start: addr,
-                size: size,
+                size,
                 mark: NodeMark::FreshAlloc,
             }));
             self.node_id += 1;
