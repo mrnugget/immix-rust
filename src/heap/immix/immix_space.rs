@@ -230,7 +230,6 @@ impl ImmixSpace {
         }
     }
 
-    #[allow(unused_variables)]
     pub fn sweep(&self) {
         let mut free_lines = 0;
         let mut usable_blocks = 0;
@@ -247,11 +246,11 @@ impl ImmixSpace {
             let mut has_free_lines = false;
 
             {
-                let mut cur_line_mark_table = block.line_mark_table_mut();
+                let cur_line_mark_table = block.line_mark_table_mut();
                 for i in 0..cur_line_mark_table.len() {
-                    if cur_line_mark_table.get(i) != immix::LineMark::Live
-                        && cur_line_mark_table.get(i) != immix::LineMark::ConservLive
-                    {
+                    let mark = cur_line_mark_table.get(i);
+
+                    if mark != immix::LineMark::Live && mark != immix::LineMark::ConservLive {
                         has_free_lines = true;
                         cur_line_mark_table.set(i, immix::LineMark::Free);
 
@@ -413,4 +412,3 @@ impl fmt::Display for ImmixBlock {
         write!(f, "]")
     }
 }
-
