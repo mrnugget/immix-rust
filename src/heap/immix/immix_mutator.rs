@@ -52,7 +52,7 @@ pub struct ImmixMutatorGlobal {
 }
 
 impl ImmixMutatorLocal {
-    pub fn reset(&mut self) -> () {
+    pub fn reset(&mut self) {
         unsafe {
             // should not use Address::zero() other than initialization
             self.cursor = Address::zero();
@@ -81,8 +81,8 @@ impl ImmixMutatorLocal {
             block: None,
             alloc_map: space.alloc_map.ptr,
             space_start: space.start(),
-            global: global,
-            space: space,
+            global,
+            space,
         };
         *id_lock += 1;
 
@@ -100,7 +100,7 @@ impl ImmixMutatorLocal {
         mutators_lock.push(None);
         mutators_lock.swap_remove(self.id);
 
-        *mutator_count_lock = *mutator_count_lock - 1;
+        *mutator_count_lock -= 1;
 
         if cfg!(debug_assertions) {
             println!(
@@ -146,7 +146,7 @@ impl ImmixMutatorLocal {
         unsafe {
             *self
                 .alloc_map
-                .offset((addr.diff(self.space_start) >> LOG_POINTER_SIZE) as isize) = encode;
+                .add(addr.diff(self.space_start) >> LOG_POINTER_SIZE) = encode;
         }
     }
 
@@ -311,4 +311,3 @@ impl fmt::Display for ImmixMutatorLocal {
         }
     }
 }
-

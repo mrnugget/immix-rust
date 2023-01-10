@@ -203,7 +203,7 @@ pub fn sync_barrier(mutator: &mut ImmixMutatorLocal) {
 
         // mutators will resume
         CONTROLLER.store(NO_CONTROLLER, Ordering::SeqCst);
-        for mut t in MUTATORS.write().unwrap().iter_mut() {
+        for t in MUTATORS.write().unwrap().iter_mut() {
             if t.is_some() {
                 let t_mut = t.as_mut().unwrap();
                 t_mut.set_take_yield(false);
@@ -238,13 +238,10 @@ fn block_current_thread(mutator: &mut ImmixMutatorLocal) {
     trace!("Mutator{} unblocked", mutator.id());
 }
 
-pub static GC_COUNT: atomic::AtomicUsize = atomic::ATOMIC_USIZE_INIT;
+pub static GC_COUNT: atomic::AtomicUsize = atomic::AtomicUsize::new(0);
 
 fn gc() {
-    GC_COUNT.store(
-        GC_COUNT.load(atomic::Ordering::SeqCst) + 1,
-        atomic::Ordering::SeqCst,
-    );
+    GC_COUNT.fetch_add(1, atomic::Ordering::SeqCst);
 
     trace!("GC starts");
 
@@ -279,7 +276,7 @@ fn gc() {
 pub const MULTI_THREAD_TRACE_THRESHOLD: usize = 10;
 
 pub const PUSH_BACK_THRESHOLD: usize = 50;
-pub static GC_THREADS: atomic::AtomicUsize = atomic::ATOMIC_USIZE_INIT;
+pub static GC_THREADS: atomic::AtomicUsize = atomic::AtomicUsize::new(0);
 
 #[allow(unused_variables)]
 #[inline(never)]

@@ -369,8 +369,8 @@ unsafe impl Send for ImmixSpace {}
 
 impl fmt::Display for ImmixSpace {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "ImmixSpace\n").unwrap();
-        write!(f, "range={:#X} ~ {:#X}\n", self.start, self.end).unwrap();
+        writeln!(f, "ImmixSpace").unwrap();
+        writeln!(f, "range={:#X} ~ {:#X}", self.start, self.end).unwrap();
 
         // print table by vec
         //        write!(f, "table={{\n").unwrap();
@@ -383,7 +383,7 @@ impl fmt::Display for ImmixSpace {
         //        }
         //        write!(f, "\n}}\n").unwrap();
 
-        write!(f, "t_ptr={:?}\n", self.line_mark_table.ptr).unwrap();
+        writeln!(f, "t_ptr={:?}", self.line_mark_table.ptr).unwrap();
         //        write!(f, "usable blocks:\n").unwrap();
         //        for b in self.usable_blocks.iter() {
         //            write!(f, "  {}\n", b).unwrap();
@@ -392,7 +392,7 @@ impl fmt::Display for ImmixSpace {
         //        for b in self.used_blocks.iter() {
         //            write!(f, "  {}\n", b).unwrap();
         //        }
-        write!(f, "done\n")
+        writeln!(f, "done")
     }
 }
 
