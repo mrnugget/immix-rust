@@ -27,7 +27,7 @@ pub fn alloc_mark() {
         let space: FreeListSpace = FreeListSpace::new(heap::LO_SPACE_SIZE.load(Ordering::SeqCst));
         Arc::new(RwLock::new(space))
     };
-    heap::gc::init(shared_space.clone(), lo_space.clone());
+    heap::gc::init(shared_space.clone(), lo_space);
 
     let mut mutator = ImmixMutatorLocal::new(shared_space.clone());
 
@@ -107,4 +107,3 @@ fn mark_loop(objs: Vec<ObjectReference>, shared_space: &Arc<ImmixSpace>) {
 fn mark_loop(objs: Vec<ObjectReference>, shared_space: &Arc<ImmixSpace>) {
     unimplemented!()
 }
-

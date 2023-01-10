@@ -154,13 +154,9 @@ const SPACE_ALIGN: usize = 1 << 19;
 impl ImmixSpace {
     pub fn new(space_size: usize) -> ImmixSpace {
         // acquire memory through mmap
-        let anon_mmap: memmap::Mmap = match memmap::Mmap::anonymous(
-            space_size + SPACE_ALIGN,
-            memmap::Protection::ReadWrite,
-        ) {
-            Ok(m) => m,
-            Err(_) => panic!("failed to call mmap"),
-        };
+        let anon_mmap =
+            memmap::Mmap::anonymous(space_size + SPACE_ALIGN, memmap::Protection::ReadWrite)
+                .expect("failed to call mmap");
         let start: Address =
             unsafe { Address::from_ptr::<u8>(anon_mmap.ptr()).align_up(SPACE_ALIGN) };
         let end: Address = start.plus(space_size);
@@ -168,11 +164,11 @@ impl ImmixSpace {
         let line_mark_table = LineMarkTable::new(start, end);
 
         let mut ret = ImmixSpace {
-            start: start,
-            end: end,
+            start,
+            end,
             mmap: anon_mmap,
 
-            line_mark_table: line_mark_table,
+            line_mark_table,
             trace_map: Arc::new(AddressMap::new(start, end)),
             alloc_map: Arc::new(AddressMap::new(start, end)),
             usable_blocks: Mutex::new(LinkedList::new()),
@@ -185,7 +181,7 @@ impl ImmixSpace {
         ret
     }
 
-    fn init_blocks(&mut self) -> () {
+    fn init_blocks(&mut self) {
         let mut id = 0;
         let mut block_start = self.start;
         let mut line = 0;
@@ -194,7 +190,7 @@ impl ImmixSpace {
 
         while block_start.plus(immix::BYTES_IN_BLOCK) <= self.end {
             usable_blocks_lock.push_back(Box::new(ImmixBlock {
-                id: id,
+                id,
                 state: immix::BlockMark::Usable,
                 start: block_start,
                 line_mark_table: self.line_mark_table.take_slice(line, immix::LINES_IN_BLOCK),
@@ -216,18 +212,13 @@ impl ImmixSpace {
         self.used_blocks.lock().unwrap().push_front(old);
     }
 
-    #[allow(unreachable_code)]
     pub fn get_next_usable_block(&self) -> Option<Box<ImmixBlock>> {
-        let res_new_block: Option<Box<ImmixBlock>> =
-            { self.usable_blocks.lock().unwrap().pop_front() };
+        let res_new_block = self.usable_blocks.lock().unwrap().pop_front();
         if res_new_block.is_none() {
             // should unlock, and call GC here
             gc::trigger_gc();
-
-            None
-        } else {
-            res_new_block
         }
+        res_new_block
     }
 
     pub fn sweep(&self) {
