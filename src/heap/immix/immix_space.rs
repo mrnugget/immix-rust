@@ -51,7 +51,7 @@ impl LineMarkTable {
         };
 
         LineMarkTable {
-            space_start: space_start,
+            space_start,
             ptr: line_mark_table,
             len: line_mark_table_len,
         }
@@ -59,21 +59,21 @@ impl LineMarkTable {
 
     pub fn take_slice(&mut self, start: usize, len: usize) -> LineMarkTableSlice {
         LineMarkTableSlice {
-            ptr: unsafe { self.ptr.offset(start as isize) },
-            len: len,
+            ptr: unsafe { self.ptr.add(start) },
+            len,
         }
     }
 
     #[inline(always)]
     fn get(&self, index: usize) -> immix::LineMark {
         debug_assert!(index <= self.len);
-        unsafe { *self.ptr.offset(index as isize) }
+        unsafe { *self.ptr.add(index) }
     }
 
     #[inline(always)]
     fn set(&self, index: usize, value: immix::LineMark) {
         debug_assert!(index <= self.len);
-        unsafe { *self.ptr.offset(index as isize) = value };
+        unsafe { *self.ptr.add(index) = value };
     }
 
     #[inline(always)]
