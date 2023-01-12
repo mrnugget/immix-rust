@@ -51,8 +51,8 @@ pub extern "C" fn gc_init(immix_size: usize, lo_size: usize, n_gcthreads: usize)
     };
 
     *MY_GC.write().unwrap() = Some(GC {
-        immix_space: immix_space,
-        lo_space: lo_space,
+        immix_space,
+        lo_space,
     });
     println!(
         "heap is {} bytes (immix: {} bytes, lo: {} bytes) . ",
