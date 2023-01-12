@@ -184,6 +184,7 @@ impl ImmixMutatorLocal {
                     self.line = end_line;
 
                     // println!("{}", self);
+                    // Zero the memory
                     self.cursor.memset(0, self.limit.diff(self.cursor));
 
                     for line in next_available_line..end_line {

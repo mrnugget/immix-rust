@@ -138,7 +138,7 @@ pub fn start() {
     let n_threads: i32 = {
         let args: Vec<_> = env::args().collect();
         if args.len() > 1 {
-            i32::from_str_radix(&args[1], 10).unwrap()
+            args[1].parse::<i32>().unwrap()
         } else {
             8
         }
@@ -222,4 +222,3 @@ pub fn start() {
         heap::gc::GC_COUNT.load(Ordering::SeqCst)
     );
 }
-
