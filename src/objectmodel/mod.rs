@@ -1,5 +1,7 @@
+#![allow(clippy::missing_safety_doc)]
+
 use std::sync::atomic;
-pub static MARK_STATE: atomic::AtomicUsize = atomic::ATOMIC_USIZE_INIT;
+pub static MARK_STATE: atomic::AtomicUsize = atomic::AtomicUsize::new(0);
 
 use common::ObjectReference;
 
@@ -53,4 +55,3 @@ pub const SHORT_ENCODE_BIT: usize = 7;
 pub unsafe fn get_ref_byte(alloc_map: *mut u8, space_start: Address, obj: ObjectReference) -> u8 {
     unsafe { *alloc_map.offset((obj.to_address().diff(space_start) >> LOG_POINTER_SIZE) as isize) }
 }
-

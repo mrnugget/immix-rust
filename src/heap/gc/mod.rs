@@ -1,3 +1,5 @@
+#![allow(clippy::missing_safety_doc)]
+
 use heap::freelist::FreeListSpace;
 use heap::immix::ImmixLineMarkTable;
 use heap::immix::ImmixMutatorLocal;
@@ -28,7 +30,7 @@ use std::sync::atomic;
 
 lazy_static! {
     static ref STW_COND: Arc<(Mutex<usize>, Condvar)> = Arc::new((Mutex::new(0), Condvar::new()));
-    static ref GET_ROOTS: RwLock<Box<Fn() -> Vec<ObjectReference> + Sync + Send>> =
+    static ref GET_ROOTS: RwLock<Box<dyn Fn() -> Vec<ObjectReference> + Sync + Send>> =
         RwLock::new(Box::new(get_roots));
     static ref GC_CONTEXT: RwLock<GCContext> = RwLock::new(GCContext {
         immix_space: None,
@@ -152,7 +154,14 @@ pub fn stack_scan() -> Vec<ObjectReference> {
 
 #[inline(never)]
 pub fn sync_barrier(mutator: &mut ImmixMutatorLocal) {
-    let controller_id = CONTROLLER.compare_and_swap(-1, mutator.id() as isize, Ordering::SeqCst);
+    let controller_id = CONTROLLER
+        .compare_exchange(
+            -1,
+            mutator.id() as isize,
+            Ordering::SeqCst,
+            Ordering::SeqCst,
+        )
+        .unwrap();
 
     trace!(
         "Mutator{} saw the controller is {}",
@@ -360,8 +369,6 @@ fn start_steal_trace(
     immix_space: Arc<ImmixSpace>,
     lo_space: Arc<RwLock<FreeListSpace>>,
 ) {
-    use objectmodel;
-
     let mut local_queue = vec![];
 
     let line_mark_table = &immix_space.line_mark_table;
@@ -622,8 +629,6 @@ pub unsafe fn process_edge(
     space_start: Address,
     mark_state: u8,
 ) {
-    use objectmodel;
-
     let obj_addr: ObjectReference = unsafe { addr.load() };
 
     if !obj_addr.to_address().is_zero()

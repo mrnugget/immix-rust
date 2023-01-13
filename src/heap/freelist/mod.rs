@@ -26,7 +26,7 @@ impl FreeListSpace {
         }
     }
 
-    pub fn mark(&mut self, obj: Address) {}
+    pub fn mark(&mut self, _obj: Address) {}
 
     pub fn alloc(&mut self, size: usize, align: usize) -> Option<Address> {
         if self.used_bytes + size > self.size {

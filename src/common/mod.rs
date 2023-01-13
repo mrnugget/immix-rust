@@ -133,6 +133,7 @@ impl fmt::Debug for Address {
 }
 
 #[derive(Copy, Clone, Eq)]
+#[repr(C)]
 pub struct ObjectReference(usize);
 
 impl ObjectReference {
