@@ -129,7 +129,7 @@ impl ImmixMutatorLocal {
         let start = self.cursor.align_up(align);
         let end = start.plus(size);
 
-        // println!("cursor = {:#X}, after align = {:#X}", c, start);
+        // println!("cursor = {:#X}, after align = {:#X}", self.cursor, start);
 
         if end > self.limit {
             self.try_alloc_from_local(size, align)
