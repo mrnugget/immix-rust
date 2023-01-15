@@ -207,8 +207,11 @@ impl ImmixSpace {
     pub fn return_used_block(&self, old: Box<ImmixBlock>) {
         // Unsafe and raw pointers are used to transfer ImmixBlock to/from each Mutator.
         // This avoids explicit ownership transferring
-        // If we explicitly transfer ownership, the function needs to own the Mutator in order to move the ImmixBlock out of it (see ImmixMutatorLocal.alloc_from_global()),
-        // and this will result in passing the Mutator object as value (instead of a borrowed reference) all the way in the allocation
+        //
+        // If we explicitly transfer ownership, the function needs to own the Mutator in order to
+        // move the ImmixBlock out of it (see ImmixMutatorLocal.alloc_from_global()), and this will
+        // result in passing the Mutator object as value (instead of a borrowed reference) all the
+        // way in the allocation
         self.used_blocks.lock().unwrap().push_front(old);
     }
 

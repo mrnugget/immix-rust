@@ -540,6 +540,7 @@ pub fn steal_process_edge(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 #[inline(always)]
 pub unsafe fn trace_object(
     obj: ObjectReference,
