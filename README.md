@@ -86,6 +86,15 @@ will generate a dynamic linked library under `target/release/`.
 `rust_c_interface/test.c` gives an example on how to use the GC from
 C code. Compile and link `test.c` with the library to test.
 
+Dependencies
+------
+
+On Linux you need to install `libpfm4`:
+
+```
+sudo apt install libpfm4-dev
+```
+
 Near Future Plan
 ------
 
